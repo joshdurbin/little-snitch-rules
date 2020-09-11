@@ -1,0 +1,39 @@
+plugins {
+    id 'groovy'
+    id 'application'
+    id 'com.google.cloud.tools.jib' version '2.5.0'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    compile group: 'io.javalin', name: 'javalin', version: '3.10.1'
+    runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.8.0-beta4'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.5'
+    testImplementation 'org.spockframework:spock-core:2.0-M3-groovy-3.0'
+}
+
+application {
+    mainClassName = 'io.durbs.lsrules.App'
+}
+
+targetCompatibility = 11
+
+jib {
+    to {
+        image = 'joshdurbin/little-snitch-rules'
+
+        if (System.getenv('CI')) {
+            auth {
+                username = System.getenv('DOCKER_USERNAME')
+                password = System.getenv('DOCKER_PASSWORD')
+            }
+        }
+    }
+    container {
+        ports = ['9999']
+    }
+}
